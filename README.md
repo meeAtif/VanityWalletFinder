@@ -3,7 +3,6 @@
 A high-performance, multi-process crypto vanity wallet generator with a modern GUI. 
 Supports **Bitcoin (Legacy & SegWit)** and **Ethereum**.
 
-![Screenshot](https://via.placeholder.com/800x600?text=App+Screenshot+Here)
 
 ## Features
 

@@ -1,0 +1,9 @@
+mnemonic==0.20
+eth-account==0.10.0
+bip32utils==0.3.post4
+colorama==0.4.6
+bech32==1.2.0
+bip-utils==2.9.3
+coincurve==20.0.0
+customtkinter
+pyinstaller

@@ -1,0 +1,19 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller artifacts
+build/
+dist/
+*.spec
+
+# User output
+output/
+found_wallets/
+*.log
+
+# Environment
+.env
+venv/
+env/

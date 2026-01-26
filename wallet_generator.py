@@ -55,7 +55,7 @@ def check_criteria(address, patterns):
 
     return None, 0
 
-def worker_process(network, patterns, result_queue, counter_queue, stop_event):
+def worker_process(network, patterns, word_count, indices, result_queue, counter_queue, stop_event):
     """
     Worker process to generate wallets and check patterns.
     """
@@ -63,6 +63,8 @@ def worker_process(network, patterns, result_queue, counter_queue, stop_event):
         mnemonic_gen = Bip39MnemonicGenerator()
         seed_gen = Bip39SeedGenerator
         
+        words_num = Bip39WordsNum.WORDS_NUM_12 if word_count == 12 else Bip39WordsNum.WORDS_NUM_24
+
         while not stop_event.is_set():
             # Generate batch
             for _ in range(BATCH_SIZE):
@@ -70,7 +72,7 @@ def worker_process(network, patterns, result_queue, counter_queue, stop_event):
                     return
 
                 # Generate Mnemonic
-                mnemonic_phrase = mnemonic_gen.FromWordsNumber(Bip39WordsNum.WORDS_NUM_12)
+                mnemonic_phrase = mnemonic_gen.FromWordsNumber(words_num)
                 seed_bytes = seed_gen(mnemonic_phrase).Generate()
                 
                 bip_obj_ctx = None
@@ -90,8 +92,8 @@ def worker_process(network, patterns, result_queue, counter_queue, stop_event):
                 elif network == 'BTC_SEGWIT':
                     acc = bip_obj_ctx.Purpose().Coin().Account(0).Change(Bip44Changes.CHAIN_EXT)
                 
-                # Scan 5 addresses
-                for i in range(5):
+                # Scan selected addresses
+                for i in indices:
                     addr_ctx = acc.AddressIndex(i)
                     address = addr_ctx.PublicKey().ToAddress()
                     
@@ -110,7 +112,7 @@ def worker_process(network, patterns, result_queue, counter_queue, stop_event):
             
             # Update counter
             try:
-                counter_queue.put(BATCH_SIZE * 5)
+                counter_queue.put(BATCH_SIZE * len(indices))
             except Full:
                 pass
                 
@@ -125,14 +127,14 @@ class GeneratorManager:
         self.counter_queue = multiprocessing.Queue()
         self.stop_event = multiprocessing.Event()
         
-    def start_generation(self, network, patterns, num_processes):
+    def start_generation(self, network, patterns, num_processes, word_count=12, indices=[0, 1, 2, 3, 4]):
         self.stop_generation() # Ensure stopped first
         self.stop_event.clear()
         
         for _ in range(num_processes):
             p = multiprocessing.Process(
                 target=worker_process, 
-                args=(network, patterns, self.result_queue, self.counter_queue, self.stop_event)
+                args=(network, patterns, word_count, indices, self.result_queue, self.counter_queue, self.stop_event)
             )
             p.daemon = True
             p.start()

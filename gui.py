@@ -63,9 +63,39 @@ class WalletFinderApp(ctk.CTk):
         )
         self.action_btn.grid(row=0, column=5, padx=20, pady=10)
 
+        # Row 1: Advanced Settings
+        self.words_label = ctk.CTkLabel(self.control_frame, text="Words:")
+        self.words_label.grid(row=1, column=0, padx=10, pady=5)
+        self.words_var = ctk.StringVar(value="12 Words")
+        self.words_menu = ctk.CTkOptionMenu(
+            self.control_frame, 
+            values=["12 Words", "24 Words"],
+            variable=self.words_var,
+            width=100
+        )
+        self.words_menu.grid(row=1, column=1, padx=10, pady=5)
+        
+        self.scope_label = ctk.CTkLabel(self.control_frame, text="Scope:")
+        self.scope_label.grid(row=1, column=2, padx=10, pady=5)
+        self.scope_var = ctk.StringVar(value="First 5")
+        self.scope_menu = ctk.CTkOptionMenu(
+            self.control_frame, 
+            values=["First 1", "First 5", "Specific"],
+            variable=self.scope_var,
+            command=self.on_scope_change,
+            width=100
+        )
+        self.scope_menu.grid(row=1, column=3, padx=10, pady=5)
+        
+        self.index_entry = ctk.CTkEntry(self.control_frame, placeholder_text="Idx (e.g. 0)", width=80)
+        # Initially hidden or disabled? Let's just grid it but disable if not needed, or hide.
+        # Hiding is cleaner.
+        self.index_entry.grid(row=1, column=4, padx=5, pady=5)
+        self.index_entry.grid_remove() # Start hidden
+
         # === CRITERIA PANEL (Middle) ===
         self.criteria_frame = ctk.CTkFrame(self)
-        self.criteria_frame.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        self.criteria_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
         
         # Pattern Inputs
         self.p_start_label = ctk.CTkLabel(self.criteria_frame, text="Starts with (comma sep):")
@@ -87,8 +117,8 @@ class WalletFinderApp(ctk.CTk):
 
         # === RESULTS PANEL (Bottom) ===
         self.results_frame = ctk.CTkFrame(self)
-        self.results_frame.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="nsew")
-        self.grid_rowconfigure(2, weight=1)
+        self.results_frame.grid(row=3, column=0, padx=10, pady=(0, 10), sticky="nsew")
+        self.grid_rowconfigure(3, weight=1)
         
         # Stats
         self.stats_label = ctk.CTkLabel(
@@ -109,6 +139,12 @@ class WalletFinderApp(ctk.CTk):
         self.output_dir = "found_wallets"
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
+
+    def on_scope_change(self, choice):
+        if choice == "Specific":
+            self.index_entry.grid()
+        else:
+            self.index_entry.grid_remove()
 
     def get_patterns(self):
         patterns = {}
@@ -131,18 +167,40 @@ class WalletFinderApp(ctk.CTk):
             if not patterns:
                 self.log_msg("Error: Please specify at least one pattern criteria.")
                 return
-                
+            
+            # Get Params
             network = self.network_var.get()
             threads = int(self.cpu_slider.get())
             
-            self.manager.start_generation(network, patterns, threads)
+            # Words
+            w_str = self.words_var.get()
+            word_count = 12 if "12" in w_str else 24
+            
+            # Scope
+            scope = self.scope_var.get()
+            indices = []
+            if scope == "First 1":
+                indices = [0]
+            elif scope == "First 5":
+                indices = [0, 1, 2, 3, 4]
+            elif scope == "Specific":
+                try:
+                    idx = int(self.index_entry.get().strip())
+                    if idx < 0: raise ValueError
+                    indices = [idx]
+                except:
+                    self.log_msg("Error: Invalid Index. Please enter a positive number.")
+                    return
+
+            self.manager.start_generation(network, patterns, threads, word_count, indices)
             self.is_running = True
             self.start_time = datetime.now().timestamp()
             self.total_checked = 0
             self.found_count = 0
             
             self.action_btn.configure(text="STOP", fg_color="red", hover_color="darkred")
-            self.log_msg(f"Started search for {network} with {threads} threads...")
+            self.log_msg(f"Started search for {network} ({word_count} words)...")
+            self.log_msg(f"Scanning Indices: {indices}")
             self.log_msg(f"Patterns: {patterns}")
             
         else:

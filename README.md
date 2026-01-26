@@ -1,5 +1,7 @@
 # Vanity Wallet Finder Pro
 
+[![Download for Windows](https://img.shields.io/badge/Download-Windows_EXE-blue?style=for-the-badge&logo=windows)](https://github.com/meeAtif/VanityWalletFinder/releases/latest/download/VanityWalletFinder.exe)
+
 A high-performance, multi-process crypto vanity wallet generator with a modern GUI. 
 Supports **Bitcoin (Legacy & SegWit)** and **Ethereum**.
 

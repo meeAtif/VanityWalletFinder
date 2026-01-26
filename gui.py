@@ -93,6 +93,16 @@ class WalletFinderApp(ctk.CTk):
         self.index_entry.grid(row=1, column=4, padx=5, pady=5)
         self.index_entry.grid_remove() # Start hidden
 
+        # Export Checkbox
+        self.save_var = ctk.BooleanVar(value=True)
+        self.save_chk = ctk.CTkCheckBox(
+            self.control_frame, 
+            text="Export .txt",
+            variable=self.save_var,
+            width=50
+        )
+        self.save_chk.grid(row=1, column=5, padx=10, pady=5)
+
         # === CRITERIA PANEL (Middle) ===
         self.criteria_frame = ctk.CTkFrame(self)
         self.criteria_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
@@ -242,10 +252,14 @@ class WalletFinderApp(ctk.CTk):
                f"{'-'*40}")
         self.log_msg(msg)
         
-        # Save to file
-        fname = f"wallets_{datetime.now().strftime('%Y%m%d')}.txt"
-        with open(os.path.join(self.output_dir, fname), "a") as f:
-            f.write(msg + "\n")
+        # Save to file if enabled
+        if self.save_var.get():
+            fname = f"wallets_{datetime.now().strftime('%Y%m%d')}.txt"
+            try:
+                with open(os.path.join(self.output_dir, fname), "a") as f:
+                    f.write(msg + "\n")
+            except Exception as e:
+                self.log_msg(f"Error saving to file: {e}")
 
     def log_msg(self, msg):
         self.result_box.insert("end", msg + "\n")

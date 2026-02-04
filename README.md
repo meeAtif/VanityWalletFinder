@@ -14,6 +14,10 @@ Supports **Bitcoin (Legacy & SegWit)** and **Ethereum**.
     -   Ends with
     -   Contains
     -   Repeating characters
+-   **Advanced Configuration**:
+    -   **Word Count**: Choose between 12-word (Legacy) or 24-word (High Security) mnemonics.
+    -   **Search Scope**: Scan the "First 1", "First 5", or a "Specific" index address per mnemonic.
+    -   **Export Control**: Toggle "Export .txt" to save or discard found wallets.
 -   **High Performance**: Uses `bip_utils` and multiprocessing to utilize all CPU cores.
 -   **Modern GUI**: Built with CustomTkinter for a clean, dark-mode interface.
 -   **Standalone**: Available as a single `.exe` file for Windows (no Python required).

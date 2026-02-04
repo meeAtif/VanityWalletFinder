@@ -3,7 +3,7 @@ import os
 import shutil
 
 APP_NAME = "VanityWalletFinder"
-ICON_FILE = "icon.png"
+ICON_FILE = "icon.ico"
 
 
 if os.path.exists("dist"): shutil.rmtree("dist")
@@ -31,6 +31,10 @@ if os.path.exists(ICON_FILE):
     args.append(f'--icon={ICON_FILE}')
 else:
     print(f"No icon found at {ICON_FILE}. Using default icon.")
+
+if os.path.exists("file_version_info.txt"):
+    print("Found version info file, adding to build...")
+    args.append('--version-file=file_version_info.txt')
 
 
 PyInstaller.__main__.run(args)

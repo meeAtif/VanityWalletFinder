@@ -6,8 +6,7 @@ import re
 from datetime import datetime
 from queue import Empty
 
-# Third-party libraries
-# bip_utils is highly optimized and uses coincurve/ecdsa
+
 from bip_utils import (
     Bip39MnemonicGenerator, Bip39SeedGenerator,
     Bip44, Bip44Coins, Bip44Changes,
@@ -17,12 +16,12 @@ from bip_utils import (
 import colorama
 from colorama import Fore, Style
 
-# Initialize colorama
+
 colorama.init()
 
 # Constants
 OUTPUT_DIR = "output"
-BATCH_SIZE = 50  # Increased batch size slightly as we process 5 addrs per mnemonic
+BATCH_SIZE = 50 
 
 def check_criteria(address, patterns):
     """

@@ -19,9 +19,13 @@ args = [
     '--noconsole',
     '--hidden-import=bip_utils',
     '--hidden-import=coincurve',
+    '--hidden-import=coincurve._libsecp256k1',
+    '--hidden-import=cffi',
+    '--hidden-import=_cffi_backend',
     '--hidden-import=PIL',
     '--collect-all=customtkinter',
     '--collect-all=bip_utils',
+    '--collect-all=coincurve',
     '--clean',
 ]
 
